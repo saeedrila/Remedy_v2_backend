@@ -6,6 +6,15 @@ name = "pypi"
 [packages]
 django = "*"
 python-decouple = "*"
+psycopg = "*"
+djangorestframework = "*"
+django-cors-headers = "*"
+python-magic = "*"
+djangorestframework-simplejwt = "*"
+razorpay = "*"
+pusher = "*"
+boto3 = "*"
+django-storages = "*"
 
 [dev-packages]
 
