@@ -10,7 +10,8 @@ class RazorpayTransactionSerializer(serializers.Serializer):
 class RazorpayOrderSerializer(serializers.Serializer):
     amount = serializers.IntegerField()
     currency = serializers.CharField()
-    doctor_email = serializers.CharField()
+    doctor_email = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    lab_email = serializers.CharField(required=False, allow_blank=True, allow_null=True)
     date = serializers.CharField()
     line = serializers.CharField()
     time_slot = serializers.CharField()

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import DoctorProfile
-from .models import LabProfile, LabTestsAvailable
+from .models import LabProfile, LabTests
 
 # Doctor related
 class DoctorDetailsAdmin(admin.ModelAdmin):
@@ -16,4 +16,4 @@ class LabDetailsAdmin(admin.ModelAdmin):
     list_filter = ('lab', 'experience')
 
 admin.site.register(LabProfile, LabDetailsAdmin)
-admin.site.register(LabTestsAvailable)
+admin.site.register(LabTests)

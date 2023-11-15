@@ -4,19 +4,24 @@ from .models import Appointments
 
 
 class PatientAppointmentsSerializer(serializers.ModelSerializer):
-    doctor_email = serializers.SerializerMethodField()
+    email = serializers.SerializerMethodField()
     class Meta:
         model = Appointments
         fields = [
             'appointment_id',
-            'doctor_email',
+            'email',
             'time',
             'status',
             'slot_type',
             'date'
         ]
-    def get_doctor_email(self, obj):
-        return obj.doctor.email if obj.doctor else None
+    def get_email(self, obj):
+        if hasattr(obj, 'doctor') and obj.doctor:
+            return obj.doctor.email
+        elif hasattr(obj, 'lab') and obj.lab:
+            return obj.lab.email
+        else:
+            return None
 
 class DoctorAppointmentsSerializer(serializers.ModelSerializer):
     patient_email = serializers.SerializerMethodField()
@@ -62,4 +67,7 @@ class AllAppointmentsSerializer(serializers.ModelSerializer):
 class PrescriptionSerializer(serializers.Serializer):
     appointment_id = serializers.CharField()
     prescription = serializers.CharField(max_length=500)
-    
+
+class ReportSerializer(serializers.Serializer):
+    appointment_id = serializers.CharField()
+    report = serializers.CharField(max_length=500)

@@ -1,7 +1,12 @@
 from rest_framework import serializers
 from authentication.models import Account
-from doctors_and_labs.models import DoctorAvailability, DoctorProfile, DoctorSpecializations
-
+from doctors_and_labs.models import (
+    DoctorAvailability, 
+    DoctorProfile, 
+    LabProfile,
+    DoctorSpecializations,
+    LabTests,
+)
 
 
 # Doctor specialization registration
@@ -28,15 +33,30 @@ class DoctorProfileSerializer(serializers.ModelSerializer):
 class AccountSerializerDoctorAtSpecialization(serializers.ModelSerializer):
     class Meta:
         model = Account
-        fields = ('email',)
+        fields = ('email')
 
 
 
 
-# Specialization get universal, currently not in use
+# Specialization get universal for the home/landing page
 class SpecializationSerializer(serializers.Serializer):
     specialization_title = serializers.CharField()
+# Tests for home/landing page
+class TestSerializer(serializers.Serializer):
+    test_title = serializers.CharField()
 
+#Used to list tests available for a particular lab
+class LabSpecificTestSerializer(serializers.ModelSerializer):
+    fee_per_session = serializers.IntegerField(required=False)
+
+    class Meta:
+        model = LabTests
+        fields = ('test_title','fee_per_session')
+
+class AddTestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LabTests
+        fields = ('lab', 'test_title', 'fee_per_session')
 
 
 
@@ -61,9 +81,21 @@ class DoctorAvailabilityToggleSerializer(serializers.Serializer):
     line = serializers.CharField()
     time = serializers.CharField()
 
+class LabAvailabilityToggleSerializer(serializers.Serializer):
+    status = serializers.BooleanField()
+    slot_id = serializers.CharField()
+    date = serializers.CharField()
+    line = serializers.CharField()
+    time = serializers.CharField()
+
 
 class DoctorProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = DoctorProfile
         fields = ('fee_per_session', 'experience', 'description')
+
+class LabProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LabProfile
+        fields = ('experience', 'description')
 

@@ -1,6 +1,6 @@
 from django.db import models
 from authentication.models import Account
-from doctors_and_labs.models import LabTestsAvailable
+from doctors_and_labs.models import LabTests
 from payments.models import Payments
 import uuid
 
@@ -10,7 +10,7 @@ class Appointments(models.Model):
     doctor = models.ForeignKey(Account, on_delete=models.CASCADE, null=True, related_name='doctor_appointments')
     specialization_title = models.CharField(max_length=40, null=True)
     lab = models.ForeignKey(Account, on_delete=models.CASCADE, null=True, related_name='lab_appointments')
-    lab_test = models.ForeignKey(LabTestsAvailable, on_delete=models.CASCADE, null=True)
+    lab_test = models.ForeignKey(LabTests, on_delete=models.CASCADE, null=True)
     date = models.DateField()
     time = models.CharField(max_length=20)
     status = models.CharField(max_length=20)

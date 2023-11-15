@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 # Generic show all user accounts should be deleted before deploying
 class AllAccountListView(APIView):
     def get(self, request):
-        account = Account.objects.all().order_by('-id')
+        account = Account.objects.all().order_by('-id')[:10]
         serializer = AllAccountSerializer(account, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

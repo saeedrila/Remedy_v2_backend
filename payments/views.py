@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 from rest_framework import status
 from django.db import transaction
+from django.shortcuts import get_object_or_404
 import razorpay
 
 from .serializers import (
@@ -43,17 +44,23 @@ class RazorpayOrder(APIView):
                 amount = serializer.validated_data.get('amount')
                 currency = serializer.validated_data.get('currency')
                 doctor_email = serializer.validated_data.get('doctor_email')
+                lab_email = serializer.validated_data.get('lab_email')
                 date = serializer.validated_data.get('date')
                 line = serializer.validated_data.get('line')
                 time_slot = serializer.validated_data.get('time_slot')
 
-            if not doctor_email:
-                return Response({'error': 'Doctor email is missing in request data.'}, status=status.HTTP_BAD_REQUEST)
+            if not (doctor_email or lab_email):
+                return Response({'error': 'Either Doctor or Lab email is required in the request data.'}, status=status.HTTP_BAD_REQUEST)
             
             try:
-                doctor_account = Account.objects.get(email=doctor_email)
+                doctor_account = Account.objects.get(email=doctor_email) if doctor_email else None
             except Account.DoesNotExist:
-                    return Response({'error': 'Doctor with the provided email does not exist.'}, status=status.HTTP_BAD_REQUEST)
+                return Response({'error': 'Doctor with the provided email does not exist.'}, status=status.HTTP_BAD_REQUEST)
+
+            try:
+                lab_account = Account.objects.get(email=lab_email) if lab_email else None
+            except Account.DoesNotExist:
+                return Response({'error': 'Lab with the provided email does not exist.'}, status=status.HTTP_BAD_REQUEST)
 
             amount_in_ps = amount * 100
             client = razorpay.Client(auth=(settings.RAZORPAY_KEY, settings.RAZORPAY_SECRET))
@@ -69,6 +76,7 @@ class RazorpayOrder(APIView):
             appointment_entry = Appointments.objects.create(
                 patient = account,
                 doctor = doctor_account,
+                lab = lab_account,
                 date = date,
                 slot_type = line,
                 time = time_slot,
@@ -85,7 +93,8 @@ class RazorpayOrder(APIView):
         except Exception as error:
             print('Razorpay order creation Error:', error)
             return Response({'error': 'Razorpay order creation Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+
+
 class RazorpayOrderComplete(APIView):
     def post(self, request):
         serializer = RazorpayTransactionSerializer(data=request.data)
@@ -179,10 +188,38 @@ class GetDoctorPaymentList(APIView):
             print('Serializer Error: ', serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class GetLabPaymentList(APIView):
+    def get(self, request):
+        payments_obj = Payments.objects.filter(appointment_completion=True)
+        payments_data = []
+
+        for payment in payments_obj:
+            appointment_obj = None
+            try:
+                appointment_obj = Appointments.objects.get(appointment_id=payment.appointment, lab_id=request.user)
+            except Appointments.DoesNotExist:
+                pass
+            
+            if appointment_obj:
+                payment_data = {
+                    'appointment': appointment_obj.appointment_id,
+                    'staff_payment': payment.staff_payment // 100,
+                    'platform_fee': payment.platform_fee // 100,
+                    'amount': payment.amount // 100,
+                    'date': appointment_obj.date,
+                }
+                payments_data.append(payment_data)
+
+        serializer = ExecutivePaymentListSerializer(data=payments_data, many=True)
+        if not serializer.is_valid():
+            print('Serializer Error: ', serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class GetPatientPaymentList(APIView):
     def get(self, request):
-        appointments_obj = Appointments.objects.filter(patient=request.user)
+        appointments_obj = Appointments.objects.filter(patient=request.user).order_by('-date')
         appointment_data = [{
             'appointment': appointment.appointment_id,
             'amount': appointment.payment.amount//100, 

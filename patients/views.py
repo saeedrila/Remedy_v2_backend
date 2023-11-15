@@ -10,7 +10,9 @@ from authentication.serializers import AllAccountSerializer
 from .serializers import PatientAccountSerializer
 from doctors_and_labs.models import (
     DoctorSpecializations,
+    LabTests,
     DoctorAvailability,
+    LabAvailability,
 )
 from doctors_and_labs.serializers import (
     AccountSerializerDoctorAtSpecialization,
@@ -154,3 +156,84 @@ class FetchAvailableTimingDoctor(APIView):
 
         except Account.DoesNotExist:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+class FetchAvailableTimingLab(APIView):
+    def get(self, request):
+        try:
+            title = request.query_params.get('title', None)
+            required_date = request.query_params.get('date', None)
+            if title and required_date is not None:
+                time_zone_offset = timedelta(hours=5, minutes=30)
+                current_datetime = datetime.now() + time_zone_offset
+                current_date = current_datetime.strftime('%Y-%m-%d')
+                current_time = current_datetime.strftime('%I:%M %p')
+
+                title = title.replace('-', ' ')
+                list_of_labs = LabTests.objects.filter(test_title=title, lab__is_active=True).values('lab')
+                lab_availability_per_day = LabAvailability.objects.filter(lab__in=list_of_labs, date=required_date)
+
+                data = []
+                for lab_availability in lab_availability_per_day:
+                    lab_data = {
+                        "email": lab_availability.lab.email,
+                        "online": [],
+                        "offline": [],
+                    }
+                    if lab_availability.slots_details_online:
+                        online_slots = {
+                            "day": str(lab_availability.date),
+                            "timings": []
+                        }
+                        for key, slot_data in lab_availability.slots_details_online.items():
+                            slot_time = datetime.strptime(slot_data.get('time'), '%I:%M %p')
+                            if (
+                                slot_data.get('status') == 'available'
+                                and str(lab_availability.date) == current_date
+                                and slot_time >= current_datetime
+                            ):
+                                online_slots["timings"].append(slot_data.get('time'))
+                            elif (
+                                slot_data.get('status') == 'available'
+                                and str(lab_availability.date) != current_date
+                            ):
+                                online_slots["timings"].append(slot_data.get('time'))
+
+                        if online_slots["timings"]:
+                            lab_data["online"].append(online_slots)
+                    
+                    if lab_availability.slots_details_offline:
+                        offline_slots = {
+                            "day": str(lab_availability.date),
+                            "timings": []
+                        }
+                        for key, slot_data in lab_availability.slots_details_offline.items():
+                            time_str = slot_data.get('time')
+                            time_format = '%I:%M %p'
+                            today_date = date.today()
+                            combined_datetime = datetime.combine(today_date, datetime.strptime(time_str, time_format).time())
+                            # print('Slot time: ', combined_datetime)
+                            # print('Current time: ', current_datetime)
+                            
+                            if (
+                                slot_data.get('status') == 'available'
+                                and str(lab_availability.date) == current_date
+                                and combined_datetime >= current_datetime
+                            ):
+                                offline_slots["timings"].append(slot_data.get('time'))
+                            elif (
+                                slot_data.get('status') == 'available'
+                                and str(lab_availability.date) != current_date
+                            ):
+                                offline_slots["timings"].append(slot_data.get('time'))
+
+                        if offline_slots["timings"]:
+                            lab_data["offline"].append(offline_slots)
+
+                    data.append(lab_data)
+
+                return Response(data, status=status.HTTP_200_OK)
+            else:
+                return Response({"detail": "Test not found"}, status=status.HTTP_404_NOT_FOUND)
+            
+        except LabTests.DoesNotExist:
+            return Response({"detail": "Test not found"}, status=status.HTTP_404_NOT_FOUND)
