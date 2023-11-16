@@ -4,7 +4,6 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 from rest_framework import status
 from django.db import transaction
-from django.shortcuts import get_object_or_404
 import razorpay
 
 from .serializers import (
@@ -16,7 +15,7 @@ from .serializers import (
 from .models import Payments
 from appointments.models import Appointments
 from authentication.models import Account
-from doctors_and_labs.models import DoctorAvailability
+from doctors_and_labs.models import DoctorAvailability, LabAvailability
 
 
 
@@ -114,25 +113,43 @@ class RazorpayOrderComplete(APIView):
                     appointment_obj.status = 'Booked'
                     appointment_obj.save()
 
-                doctor_availability_obj = DoctorAvailability.objects.get(date=appointment_obj.date, doctor_id=appointment_obj.doctor_id)
-                target_time = appointment_obj.time
-                new_status = "1"
+                if appointment_obj.doctor_id:
+                    doctor_availability_obj = DoctorAvailability.objects.get(date=appointment_obj.date, doctor_id=appointment_obj.doctor_id)
+                    target_time = appointment_obj.time
+                    new_status = "1"
 
-                if appointment_obj.slot_type == 'offline':
-                    slots_details = doctor_availability_obj.slots_details_offline
+                    for slots_details in [doctor_availability_obj.slots_details_offline, doctor_availability_obj.slots_details_online]:
+                        for slot_key, slot_info in slots_details.items():
+                            if slot_info["time"] == target_time:
+                                slot_info["status"] = new_status
+
+                        if appointment_obj.slot_type == 'offline':
+                            doctor_availability_obj.slots_details_offline = slots_details
+                        else:
+                            doctor_availability_obj.slots_details_online = slots_details
+
+                        doctor_availability_obj.save()
                 else:
-                    slots_details = doctor_availability_obj.slots_details_online
+                    lab_availability_obj = LabAvailability.objects.get(date=appointment_obj.date, lab_id=appointment_obj.lab_id)
+                    target_time = appointment_obj.time
+                    new_status = "1"
 
-                for slot_key, slot_info in slots_details.items():
-                    if slot_info["time"] == target_time:
-                        slot_info["status"] = new_status
+                    if appointment_obj.slot_type == 'offline':
+                        slots_details = lab_availability_obj.slots_details_offline
+                    else:
+                        slots_details = lab_availability_obj.slots_details_online
 
-                if appointment_obj.slot_type == 'offline':
-                    doctor_availability_obj.slots_details_offline = slots_details
-                else:
-                    doctor_availability_obj.slots_details_online = slots_details
+                    for slot_key, slot_info in slots_details.items():
+                        if slot_info["time"] == target_time:
+                            slot_info["status"] = new_status
 
-                doctor_availability_obj.save()
+                    if appointment_obj.slot_type == 'offline':
+                        lab_availability_obj.slots_details_offline = slots_details
+                    else:
+                        lab_availability_obj.slots_details_online = slots_details
+
+                    lab_availability_obj.save()
+
 
             except Payments.DoesNotExist:
                     return Response({'error': 'Payment error saving on db error'}, status=status.HTTP_BAD_REQUEST)

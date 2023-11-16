@@ -55,7 +55,7 @@ class FetchLabAppointData(APIView):
         try:
             account = Account.objects.get(id = request.user.id)
             # print('Account: ', account)
-            appointments_list = Appointments.objects.filter(doctor_id=account).order_by('-order_created')
+            appointments_list = Appointments.objects.filter(lab_id=account).order_by('-order_created')
             # print('Appointment list: ', appointments_list)
             serializer = DoctorAppointmentsSerializer(appointments_list, many=True)
             # print('Serialized data: ', serializer.data)
@@ -120,6 +120,7 @@ class AppointmentPrescription(APIView):
 
         except Appointments.DoesNotExist:
             return Response({"error": "Appointment not found"}, status=status.HTTP_404_NOT_FOUND)
+
 # Handles Lab's reports
 class AppointmentReport(APIView):
     def get(self, request):
@@ -137,7 +138,7 @@ class AppointmentReport(APIView):
             return Response({"error": "Appointment not found"}, status=status.HTTP_404_NOT_FOUND)
     
     def patch(self, request):
-        print(request.data)
+        # print(request.data)
         serializer = ReportSerializer(data=request.data)
 
         if not serializer.is_valid():
@@ -192,7 +193,7 @@ class FetchExecutiveDashboardData(APIView):
         }
         return Response(data, status=status.HTTP_200_OK)
 
-
+# Fetch data for dashboard
 class FetchDoctorDashboardData(APIView):
     def get(self, request):
         account = Account.objects.get(id=request.user.id)
@@ -222,9 +223,10 @@ class FetchDoctorDashboardData(APIView):
             'total_appointments_today_completed': total_appointments_today_completed,
             'total_appointment_today_completed_perc': total_appointment_today_completed_perc
         }
-        print('Data: ', data)
+        # print('Data: ', data)
         return Response(data, status=status.HTTP_200_OK)
-    
+
+# Fetch data for dashboard
 class FetchLabDashboardData(APIView):
     def get(self, request):
         account = Account.objects.get(id=request.user.id)
@@ -254,5 +256,5 @@ class FetchLabDashboardData(APIView):
             'total_appointments_today_completed': total_appointments_today_completed,
             'total_appointment_today_completed_perc': total_appointment_today_completed_perc
         }
-        print('Data: ', data)
+        # print('Data: ', data)
         return Response(data, status=status.HTTP_200_OK)

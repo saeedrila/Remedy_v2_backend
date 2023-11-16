@@ -254,7 +254,7 @@ class LabAvailabilityRegistration(APIView):
                 line = serializer.validated_data.get('line')
                 slot_id = serializer.validated_data.get('slot_id')
                 slot_status_script = 'available' if slot_status else 'notAvailable'
-                print('Date: ', date, 'Line: ', line, 'Slot_id: ', slot_id, 'Status: ', slot_status_script)
+                # print('Date: ', date, 'Line: ', line, 'Slot_id: ', slot_id, 'Status: ', slot_status_script)
 
                 # column_name = 'slots_status_offline' if line == 'offline' else 'slots_status_online'
                 
@@ -463,7 +463,7 @@ class LabSpecificTest(APIView):
     def get(self, request):
         try:
             tests_available = LabTests.objects.filter(lab_id=request.user).values('test_title', 'fee_per_session').distinct()
-            print('Distinct Tests: ', tests_available)
+            # print('Distinct Tests: ', tests_available)
             serializer = LabSpecificTestSerializer(tests_available, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         
@@ -480,7 +480,7 @@ class DoctorsListAtSpecialization(APIView):
                 title = title.replace('-', ' ')
                 list_of_doctors = DoctorSpecializations.objects.filter(specialization_title=title).values('doctor')
                 serializer = AccountSerializerDoctorAtSpecialization(Account.objects.filter(id__in=list_of_doctors), many=True)
-                print('List of doctors serializer: ',serializer)
+                # print('List of doctors serializer: ',serializer)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:
                 return Response({"detail": "Specialization not found"}, status=status.HTTP_404_NOT_FOUND)

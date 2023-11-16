@@ -6,6 +6,8 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from django.db.models import Q
 from rest_framework import generics
 from rest_framework import status
+from django.shortcuts import get_object_or_404
+
 
 
 from .models import ChatMessage
@@ -14,6 +16,7 @@ from .serializers import (
     MessageSerializer,
     FrontendMessageSerializer,
 )
+from appointments.models import Appointments
 
 
 
@@ -78,3 +81,38 @@ class SendMessages(generics.CreateAPIView):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    
+class InitiateChatOnAppointment(generics.CreateAPIView):
+    serializer_class = FrontendMessageSerializer
+
+    def create(self, request, *args, **kwargs):
+        appointment_id = request.data.get('appointmentId')
+        print('Appointment ID: ', appointment_id)
+
+        # Retrieve appointment details
+        appointment = get_object_or_404(Appointments, appointment_id=appointment_id)
+        if appointment.doctor:
+            sender = appointment.doctor
+        else:
+            sender = appointment.lab
+            
+        patient = appointment.patient
+
+        # Create message data
+        message_data = {
+            'sender': sender.id,
+            'reciever': patient.id,
+            'message': f'Message started for appointment: {appointment_id}',
+            'is_read': False,
+        }
+        print('Message Data: ', message_data)
+
+        # Create and save the chat message
+        serializer = self.get_serializer(data=message_data)
+        if not serializer.is_valid():
+            print('Serializer Errors:', serializer.errors)
+        self.perform_create(serializer)
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    

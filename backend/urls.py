@@ -29,7 +29,8 @@ from chat.views import (
     ChatAPI,
     MyInbox,
     GetMessages,
-    SendMessages
+    SendMessages,
+    InitiateChatOnAppointment,
 )
 from doctors_and_labs.views import (
     DoctorAvailabilityRegistration,
@@ -115,6 +116,8 @@ urlpatterns = [
     path('api/my-messages/<user_id>', MyInbox.as_view()),
     path("api/get-messages/<sender_id>/<reciever_id>", GetMessages.as_view()),
     path("api/send-messages", SendMessages.as_view()),
+    path("api/initiate-chat-on-appointment", InitiateChatOnAppointment.as_view()),
+    
 
 #Doctors and Labs
     # Get doctor availability
@@ -153,7 +156,7 @@ urlpatterns = [
     # Razorpay payment testing
     path('api/checkout_payment', CheckoutPayment.as_view(), name='checkout-payment'),
     path('api/razorpay/order/create', RazorpayOrder.as_view(), name='razorpay-order-create'),
-    path('razorpay/order/complete', RazorpayOrderComplete.as_view(), name='razorpay-order-complete'),
+    path('api/razorpay/order/complete', RazorpayOrderComplete.as_view(), name='razorpay-order-complete'),
 
     #Payment list fetching
     path('api/fetch-executive-payments', GetExecutivePaymentList.as_view(), name='fetch-executive-payments'),
