@@ -28,8 +28,6 @@ __pycache__/
 *.swp
 .DS_Store
 
-# Migrations related files
-migrations/
 
 # Media files
 backend/media/
