@@ -17,13 +17,12 @@ from appointments.views import (
     FetchLabDashboardData,
 )
 from authentication.views import (
-    AllAccountListView,
-    AddAccount,
     AccountSignup,
     AccountLogin,
     LogoutView,
     ChangePassword,
     ActivateUser,
+    TestAPIView,
 )
 from chat.views import (
     ChatAPI,
@@ -69,17 +68,16 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
 #JWT Refresh and access tokens
-    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),  # for obtaining access tokens
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),  # for refreshing tokens
-    path('token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),  # for obtaining access tokens
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),  # for refreshing tokens
+    path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
 
 #Authentication
-    # View all user data
-    path('', AllAccountListView.as_view(), name='all-account-list'),
+    # URL for backend working checking
+    path('', TestAPIView.as_view(), name='all-account-list'),
 
     # Signup, Login, and Logout API endpoints
     # Add account, Patient, Doctor, Lab, Executive accounts
-    path('api/add/', AddAccount.as_view(), name='add-account'),
     path('api/account-signup', AccountSignup.as_view(), name='account-signup'),
     path('api/account-login', AccountLogin.as_view(), name='patient-login'),
     path('api/logout', LogoutView.as_view(), name='logout-view'),

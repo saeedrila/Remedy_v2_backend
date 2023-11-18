@@ -184,21 +184,24 @@ class GetExecutivePaymentList(APIView):
 class GetDoctorPaymentList(APIView):
     def get(self, request):
         payments_obj = Payments.objects.filter(appointment_completion=True)
-        payments_data = [{
-            'appointment': payment.appointment, 
-            'staff_payment': payment.staff_payment//100, 
-            'platform_fee': payment.platform_fee//100, 
-            'amount': payment.amount//100
-            } for payment in payments_obj]
-        for payment_data in payments_data:
-            appointment_id = payment_data['appointment']
+        payments_data = []
+
+        for payment in payments_obj:
+            appointment_obj = None
             try:
-                appointment_obj = Appointments.objects.get(appointment_id=appointment_id)
-                if not appointment_obj.doctor_id==request.user:
-                    pass
-                payment_data['date'] = appointment_obj.date
+                appointment_obj = Appointments.objects.get(appointment_id=payment.appointment, doctor_id=request.user)
             except Appointments.DoesNotExist:
-                payment_data['date'] = None
+                pass
+            
+            if appointment_obj:
+                payment_data = {
+                    'appointment': appointment_obj.appointment_id,
+                    'staff_payment': payment.staff_payment // 100,
+                    'platform_fee': payment.platform_fee // 100,
+                    'amount': payment.amount // 100,
+                    'date': appointment_obj.date,
+                }
+                payments_data.append(payment_data)
 
         serializer = ExecutivePaymentListSerializer(data=payments_data, many=True)
         if not serializer.is_valid():

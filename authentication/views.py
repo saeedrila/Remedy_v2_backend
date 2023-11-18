@@ -1,5 +1,4 @@
 # From libraries
-from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate, login, logout
@@ -33,25 +32,12 @@ class AllAccountListView(APIView):
         account = Account.objects.all().order_by('-id')[:10]
         serializer = AllAccountSerializer(account, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class TestAPIView(APIView):
+    def get(self, request):
+        data = 'Congratulations! Backend is working successfully'
+        return Response(data, status=status.HTTP_200_OK)
 
-
-# Sign up
-# Generic user account creation
-class AddAccount(APIView):
-    def post(self, request):
-        serializer = AccountSerializer(data=request.data)
-        if serializer.is_valid():
-            email = serializer.validated_data['email']
-            password = serializer.validated_data.get('password')
-
-            if not password:
-                return Response({'Password field is required'}, status=status.HTTP_400_BAD_REQUEST)
-            
-            account_manager = Account.objects
-            user = account_manager.create_user(email = email, password = password)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # Account signup
 class AccountSignup(APIView):
@@ -63,7 +49,7 @@ class AccountSignup(APIView):
             account_type = request.data.get('account_type')
 
             if not password:
-                return Response({'Password field is required'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'error': 'Password field is required'}, status=status.HTTP_400_BAD_REQUEST)
 
             if account_type not in ('patient', 'doctor', 'lab', 'executive'):
                 return Response({'error': 'Invalid account type'}, status=status.HTTP_400_BAD_REQUEST)
@@ -77,9 +63,10 @@ class AccountSignup(APIView):
                 is_lab = account_type == 'lab',
                 is_executive = account_type == 'executive'
             )
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'success': 'Account successfully created'}, status=status.HTTP_201_CREATED)
+        
+        print(serializer.errors)
+        return Response({'error': 'Email already exist'}, status=status.HTTP_400_BAD_REQUEST)
 
 # Account Login
 class AccountLogin(APIView):

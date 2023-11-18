@@ -6,8 +6,18 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config("SECRET_KEY")
-DEBUG = True
-ALLOWED_HOSTS = []
+ENVIRONMENT = os.environ.get('DJANGO_ENV', 'development')
+if ENVIRONMENT == 'production':
+    DEBUG = False
+else:
+    DEBUG = True
+
+ALLOWED_HOSTS = [
+    '3.110.48.219',
+    'api.remedyonline.life',
+    '127.0.0.1',
+    'main.drlei6djd9dlh.amplifyapp.com',
+]
 
 
 # Application definition
@@ -120,13 +130,15 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000'
+    'http://localhost:3000',
+    'https://app.remedyonline.life'
 ]
 
 CORS_ALLOW_HEADERS = [
@@ -142,7 +154,7 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_LIFETIME': timedelta(days=1),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=7),
     'SLIDING_TOKEN_TYPES': {
-        'access': timedelta(seconds=15),
+        'access': timedelta(minutes=60),
         'refresh': timedelta(days=1),
     },
     'ROTATE_REFRESH_TOKENS': False,
