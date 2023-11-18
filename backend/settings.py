@@ -17,6 +17,9 @@ ALLOWED_HOSTS = [
     'api.remedyonline.life',
     '127.0.0.1',
     'main.drlei6djd9dlh.amplifyapp.com',
+    'app.remedyonline.life',
+    'www.remedyonline.life',
+    'remedyonline.life'
 ]
 
 
