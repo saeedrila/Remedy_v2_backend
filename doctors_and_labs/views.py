@@ -5,7 +5,8 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime, timedelta, time, date
-import json
+from django.utils import timezone
+
 
 # From files
 from .import views
@@ -40,7 +41,8 @@ class DoctorAvailabilityRegistration(APIView):
             try:
                 account = Account.objects.get(id = request.user.id)
                 # Dates from datetime library
-                day_zero_raw = datetime.now().date()
+                current_time = timezone.now()
+                day_zero_raw = current_time.date()
                 day_one_raw = day_zero_raw + timedelta(days=1)
                 day_two_raw = day_zero_raw + timedelta(days=2)
                 day_three_raw = day_zero_raw + timedelta(days=3)
@@ -131,7 +133,7 @@ class DoctorAvailabilityRegistration(APIView):
                 line = serializer.validated_data.get('line')
                 slot_id = serializer.validated_data.get('slot_id')
                 slot_status_script = 'available' if slot_status else 'notAvailable'
-                # print('Date: ', date, 'Line: ', line, 'Slot_id: ', slot_id, 'Status: ', slot_status_script)
+                print('Date: ', date, 'Line: ', line, 'Slot_id: ', slot_id, 'Status: ', slot_status_script)
 
                 # column_name = 'slots_status_offline' if line == 'offline' else 'slots_status_online'
                 

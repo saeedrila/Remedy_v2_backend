@@ -15,6 +15,9 @@ razorpay = "*"
 pusher = "*"
 boto3 = "*"
 django-storages = "*"
+drf-yasg = "*"
+channels = "*"
+daphne = "*"
 
 [dev-packages]
 

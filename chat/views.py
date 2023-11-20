@@ -37,7 +37,7 @@ class ChatAPI(APIView):
 
 class MyInbox(generics.ListAPIView):
     serializer_class = MessageSerializer
-
+    
     def get_queryset(self):
         user_id = self.kwargs['user_id']
 
