@@ -24,6 +24,10 @@ ALLOWED_HOSTS = [
 
 
 INSTALLED_APPS = [
+    # Chat
+    'daphne',
+    'channels',
+
     # Default Apps
     'django.contrib.admin',
     'django.contrib.auth',
@@ -43,9 +47,6 @@ INSTALLED_APPS = [
     'video_call',
     'chat',
 
-    #Channels for chat
-    # 'channels',
-
     #api related apps
     'corsheaders',
     'rest_framework',
@@ -62,6 +63,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    #'channels.middleware.WebSocketMiddleware',
 ]
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
@@ -88,6 +90,12 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'backend.wsgi.application'
+ASGI_APPLICATION = 'backend.asgi.application'
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
 
 
 # Database
@@ -125,11 +133,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+# Time zone, Language, etc.
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
+
+
 
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
@@ -189,6 +199,8 @@ LOGGING = {
     },
 }
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 # Razorpay payment keys
 RAZORPAY_KEY = config("RAZORPAY_KEY")
 RAZORPAY_SECRET = config("RAZORPAY_SECRET")
@@ -211,4 +223,3 @@ AWS_DEFAULT_ACL =  None
 AWS_S3_VERITY = True
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

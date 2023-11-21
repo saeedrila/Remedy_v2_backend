@@ -1,3 +1,6 @@
+# Not using anymore
+
+
 import pusher
 from django.conf import settings
 

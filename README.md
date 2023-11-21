@@ -21,6 +21,14 @@ This module deals with all video call related APIs, settings, keys, etc.
 ### Module 9: Chat
 This module deals with all chat related APIs, settings, keys, etc.
 
+Versioning:
+I am planning to use semantic versioning for the application backend as well as for the frontend. The structure is as follows:
+<major>.<minor>.<patch>
+Major: Major changes in the code which is incompatible with previous code.
+Minor: Adding new features or changes
+Patch: Bug fixes
+The versioning is mainly for developmental purpose. Since the versioning starting from 1.x.x, the urls starts with 'api'.
+
 
 ## Prerequisites:
 I am using VSCode for my development and its integrated terminal. Any IDE and command prompt is enough.
