@@ -1,5 +1,3 @@
-from rest_framework.views import APIView
-from .pusher import pusher_client
 from rest_framework.response import Response
 from django.db.models import OuterRef, Subquery
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -7,36 +5,21 @@ from django.db.models import Q
 from rest_framework import generics
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-
-
+import uuid
 
 from .models import ChatMessage
 from authentication.models import Account
 from .serializers import (
     MessageSerializer,
     FrontendMessageSerializer,
+    MyInboxSerializer,
 )
 from appointments.models import Appointments
 
 
 
-# Developed for Pusher. Not using anymore
-class ChatAPI(APIView):
-    def post(self, request):
-        sender_email = request.data['senderEmail']
-        recipient_email = request.data['recipientEmail']
-        message_text = request.data['message']
-
-        pusher_client.trigger('Remedy-development', 'message', {
-            'email': sender_email,
-            'message': message_text,
-        })
-
-        return Response(['Message recieved'])
-
-
 class MyInbox(generics.ListAPIView):
-    serializer_class = MessageSerializer
+    serializer_class = MyInboxSerializer
     
     def get_queryset(self):
         user_id = self.kwargs['user_id']
@@ -98,12 +81,16 @@ class InitiateChatOnAppointment(generics.CreateAPIView):
             
         patient = appointment.patient
 
+        unique_identifier = str(uuid.uuid4())
+        room_id = unique_identifier.replace("-", "")[:6]
+
         # Create message data
         message_data = {
             'sender': sender.id,
             'reciever': patient.id,
             'message': f'Message started for appointment: {appointment_id}',
             'is_read': False,
+            'room': room_id,
         }
         print('Message Data: ', message_data)
 

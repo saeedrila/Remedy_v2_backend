@@ -28,7 +28,6 @@ from authentication.views import (
     TestAPIView,
 )
 from chat.views import (
-    ChatAPI,
     MyInbox,
     GetMessages,
     SendMessages,
@@ -126,7 +125,6 @@ urlpatterns = [
     
 
 #Chat
-    path('api/chat', ChatAPI.as_view(), name='chat-api-view'),
     path('api/my-messages/<user_id>', MyInbox.as_view()),
     path("api/get-messages/<sender_id>/<reciever_id>", GetMessages.as_view()),
     path("api/send-messages", SendMessages.as_view()),

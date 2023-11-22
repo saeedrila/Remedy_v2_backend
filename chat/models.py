@@ -5,9 +5,10 @@ from authentication.models import Account
 class ChatMessage(models.Model):
     sender = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True, related_name='sender')
     reciever = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True, related_name="reciever")
-    message = models.CharField(max_length=1000)
+    message = models.TextField()
     is_read = models.BooleanField(default=False)
     date = models.DateTimeField(auto_now_add=True)
+    room = models.CharField(max_length=10, null=True)
 
     class Meta:
         ordering = ['date']
