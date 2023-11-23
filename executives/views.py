@@ -1,28 +1,70 @@
+import os
 from rest_framework.views import APIView
 from authentication.models import Account
 from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Q
 from django.conf import settings
+from urllib.parse import urljoin
 import jwt
 
 from .serializers import (
     AccountApprovalSerializer,
     AccountApprovalPatchSerializer,
+    DoctorProfileSerializer,
+    LabProfileSerializer,
+    ExecutiveProfileSerializer,
 )
 from appointments.models import Appointments
+from doctors_and_labs.models import DoctorProfile, LabProfile
+from executives.models import ExecutiveProfile
 
 
 class AccountApproval(APIView):
     def get(self, request):
-        account = Account.objects.filter(Q(is_doctor=True) | Q(is_lab=True) | Q(is_executive=True)).order_by('-id')
+        accounts = Account.objects.filter(Q(is_doctor=True) | Q(is_lab=True) | Q(is_executive=True)).order_by('-id')
+        serialized_data = []
+
+        for account in accounts:
+            serializer = AccountApprovalSerializer(account)
+            serialized_data.append(serializer.data)
+
+            aws_public_url = 'https://remedy-development.s3.ap-south-1.amazonaws.com'
+
+            if account.is_doctor:
+                doctor_profile = DoctorProfile.objects.filter(doctor=account).first()
+                if doctor_profile:
+                    doctor_serializer = DoctorProfileSerializer(doctor_profile)
+                    document_url = doctor_serializer.data.get('document_url')
+                    if document_url is not None:
+                        document_public_url = urljoin(aws_public_url, document_url)
+                        serialized_data[-1]['document_url'] = document_public_url
+
+            if account.is_lab:
+                lab_profile = LabProfile.objects.filter(lab=account).first()
+                if lab_profile:
+                    lab_serializer = LabProfileSerializer(lab_profile)
+                    document_url = lab_serializer.data.get('document_url')
+                    if document_url is not None:
+                        document_public_url = urljoin(aws_public_url, document_url)
+                        serialized_data[-1]['document_url'] = document_public_url
+
+            if account.is_executive:
+                executive_profile = ExecutiveProfile.objects.filter(executive=account).first()
+                if executive_profile:
+                    executive_serializer = ExecutiveProfileSerializer(executive_profile)
+                    document_url = executive_serializer.data.get('document_url')
+                    if document_url is not None:
+                        document_public_url = urljoin(aws_public_url, document_url)
+                        serialized_data[-1]['document_url'] = document_public_url
+
         serializer = AccountApprovalSerializer(account, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serialized_data, status=status.HTTP_200_OK)
     
     def patch(self, request):
-        print('Requst: ', request.user)
+        # print('Requst: ', request.user)
         user_token = request.headers.get('Authorization')
-        print('Request.header: ', request.headers)
+        # print('Request.header: ', request.headers)
         if user_token and 'Bearer' in user_token:
             _, token = user_token.split(' ')
 

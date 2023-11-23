@@ -63,6 +63,9 @@ class AccountSignup(APIView):
                 is_lab = account_type == 'lab',
                 is_executive = account_type == 'executive'
             )
+            if account_type in ('doctor', 'lab', 'executive'):
+                user.is_active = False
+                user.save()
             return Response({'success': 'Account successfully created'}, status=status.HTTP_201_CREATED)
         
         print(serializer.errors)

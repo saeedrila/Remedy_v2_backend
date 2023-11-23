@@ -103,3 +103,31 @@ class InitiateChatOnAppointment(generics.CreateAPIView):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     
+class InitiateChatByExecutive(generics.CreateAPIView):
+    serializer_class = FrontendMessageSerializer
+
+    def create(self, request, *args, **kwargs):
+        staff_id = request.data.get('staffId')
+        executive_id = request.user.id
+
+        unique_identifier = str(uuid.uuid4())
+        room_id = unique_identifier.replace("-", "")[:6]
+
+        # Create message data
+        message_data = {
+            'sender': executive_id,
+            'reciever': staff_id,
+            'message': 'Conversation initiated',
+            'is_read': False,
+            'room': room_id,
+        }
+        print('Message Data: ', message_data)
+
+        # Create and save the chat message
+        serializer = self.get_serializer(data=message_data)
+        if not serializer.is_valid():
+            print('Serializer Errors:', serializer.errors)
+        self.perform_create(serializer)
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)

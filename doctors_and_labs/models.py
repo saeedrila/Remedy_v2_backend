@@ -9,7 +9,7 @@ class DoctorProfile(models.Model):
     fee_per_session = models.DecimalField(max_digits=6, decimal_places=2, null=True)
     experience = models.PositiveIntegerField(default=0, null=True)
     description = models.TextField(null=True)
-    document = models.FileField(upload_to='doctor_documents/', null=True)
+    document_url = models.CharField(max_length=100, null=True, blank=True)
 
 class DoctorAvailability(models.Model):
     date = models.DateField(db_index=True)
@@ -29,7 +29,7 @@ class LabProfile(models.Model):
     lab = models.ForeignKey(Account, on_delete=models.CASCADE)
     experience = models.PositiveIntegerField(default=0)
     description = models.TextField(null=True)
-    document = models.FileField(upload_to='lab_documents/', null=True)
+    document_url = models.CharField(max_length=100, null=True, blank=True)
 
 class LabAvailability(models.Model):
     date = models.DateField(db_index=True)

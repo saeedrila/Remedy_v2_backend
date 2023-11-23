@@ -32,6 +32,7 @@ from chat.views import (
     GetMessages,
     SendMessages,
     InitiateChatOnAppointment,
+    InitiateChatByExecutive,
 )
 from doctors_and_labs.views import (
     DoctorAvailabilityRegistration,
@@ -62,7 +63,10 @@ from payments.views import (
     GetLabPaymentList,
     GetPatientPaymentList,
 )
-from reports.views import ProfileImage
+from reports.views import (
+    UploadProfileImage,
+    UploadDocument,
+)
 
 
 schema_view = get_schema_view( 
@@ -129,6 +133,7 @@ urlpatterns = [
     path("api/get-messages/<sender_id>/<reciever_id>", GetMessages.as_view()),
     path("api/send-messages", SendMessages.as_view()),
     path("api/initiate-chat-on-appointment", InitiateChatOnAppointment.as_view()),
+    path('api/initiate-chat-by-executive', InitiateChatByExecutive.as_view()),
     
 
 #Doctors and Labs
@@ -178,7 +183,8 @@ urlpatterns = [
 
 #Reports
     # File upload
-    path('api/upload-profile-image', ProfileImage.as_view(), name='upload-profile-image'),
+    path('api/upload-profile-image', UploadProfileImage.as_view(), name='upload-profile-image'),
+    path('api/upload-document', UploadDocument.as_view(), name='upload-document'),
 
 #API documentation related
     re_path(r'^playground/$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'), 

@@ -26,8 +26,17 @@ I am planning to use semantic versioning for the application backend as well as 
 <major>.<minor>.<patch>
 Major: Major changes in the code which is incompatible with previous code.
 Minor: Adding new features or changes
-Patch: Bug fixes
+Patch: Bug fixes, 'b' represents backend and 'f' represent forntend
 The versioning is mainly for developmental purpose. Since the versioning starting from 1.x.x, the urls starts with 'api'.
+
+1.0.0:
+Working code (Not all features are tested)
+
+1.0.1b:
+* Executives can initiate chat with Staff, Doctors, and Labs.
+* Doctor, Lab, Executive models changed to accommodate document url.
+* Documents will be stored in S3 bucket, inside 'docs' library.
+* Doctor, Lab, and Executive accounts require Approval from an existing Executive account.
 
 
 ## Prerequisites:

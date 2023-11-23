@@ -92,10 +92,10 @@ class LabAvailabilityToggleSerializer(serializers.Serializer):
 class DoctorProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = DoctorProfile
-        fields = ('fee_per_session', 'experience', 'description')
+        fields = ('fee_per_session', 'experience', 'description', 'document_url')
 
 class LabProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = LabProfile
-        fields = ('experience', 'description')
+        fields = ('experience', 'description', 'document_url')
 

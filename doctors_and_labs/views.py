@@ -1,4 +1,4 @@
-# From libraries
+import os
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
@@ -311,7 +311,17 @@ class DoctorAccountDetails(APIView):
     def get(self, request):
         if request.user:
             try:
-                account_details, created = DoctorProfile.objects.get_or_create(doctor=request.user)
+                account_obj = Account.objects.get(email=request.user.email)
+                account_details, created = DoctorProfile.objects.get_or_create(doctor=account_obj)
+                aws_public_url = 'https://remedy-development.s3.ap-south-1.amazonaws.com'
+                if account_details.document_url:
+                    file_name_within_bucket = account_details.document_url
+                    document_public_url = os.path.join(
+                        aws_public_url,
+                        file_name_within_bucket
+                    )
+                    account_details.document_url = document_public_url
+
                 serializer = DoctorProfileSerializer(account_details)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             
@@ -337,7 +347,17 @@ class LabAccountDetails(APIView):
     def get(self, request):
         if request.user:
             try:
-                account_details, created = LabProfile.objects.get_or_create(lab=request.user)
+                account_obj = Account.objects.get(email=request.user.email)
+                account_details, created = LabProfile.objects.get_or_create(lab=account_obj)
+                aws_public_url = 'https://remedy-development.s3.ap-south-1.amazonaws.com'
+                if account_details.document_url:
+                    file_name_within_bucket = account_details.document_url
+                    document_public_url = os.path.join(
+                        aws_public_url,
+                        file_name_within_bucket
+                    )
+                    account_details.document_url = document_public_url
+
                 serializer = LabProfileSerializer(account_details)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             
