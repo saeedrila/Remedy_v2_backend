@@ -38,6 +38,9 @@ Working code (Not all features are tested)
 * Documents will be stored in S3 bucket, inside 'docs' library.
 * Doctor, Lab, and Executive accounts require Approval from an existing Executive account.
 
+1.0.2b:
+* Time and time zone added to the generic API window.
+
 
 ## Prerequisites:
 I am using VSCode for my development and its integrated terminal. Any IDE and command prompt is enough.
@@ -137,6 +140,10 @@ pipenv install boto3
 Install django-storages
 ```
 pipenv install django-storages
+```
+Install pytz for Indian time zone
+```
+pipenv install pytz
 ```
 
 Migrate the model to the database

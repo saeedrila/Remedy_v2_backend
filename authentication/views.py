@@ -1,4 +1,5 @@
-# From libraries
+import os
+import pytz
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate, login, logout
@@ -7,7 +8,7 @@ from rest_framework_simplejwt.tokens import Token, RefreshToken
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from rest_framework.views import APIView
-import os
+from datetime import datetime
 
 # From files
 from .import views
@@ -35,7 +36,10 @@ class AllAccountListView(APIView):
     
 class TestAPIView(APIView):
     def get(self, request):
-        data = 'Congratulations! Backend is working successfully'
+        indian_timezone = pytz.timezone('Asia/Kolkata')
+        current_time = datetime.now(indian_timezone).strftime("%Y-%m-%d %H:%M:%S")
+
+        data = f'Congratulations! Backend is working successfully. Current time (Indian Time): {current_time}'
         return Response(data, status=status.HTTP_200_OK)
 
 
