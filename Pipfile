@@ -19,6 +19,8 @@ drf-yasg = "*"
 channels = "*"
 daphne = "*"
 pytz = "*"
+uvicorn = "*"
+twisted = {version = "*", extras = ["http2", "tls"]}
 
 [dev-packages]
 

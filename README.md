@@ -41,6 +41,11 @@ Working code (Not all features are tested)
 1.0.2b:
 * Time and time zone added to the generic API window.
 
+1.0.3b:
+* Changes made according to bugs raised by project partner in boarding week.
+* Minor changes in the asgi.py file, now the server is running with 'daphne backend.asgi:application' command.
+* Installed new package for http2 and tls support.
+
 
 ## Prerequisites:
 I am using VSCode for my development and its integrated terminal. Any IDE and command prompt is enough.
@@ -144,6 +149,14 @@ pipenv install django-storages
 Install pytz for Indian time zone
 ```
 pipenv install pytz
+```
+Install uvicorn for ASGI server along with Gunicorn
+```
+pipenv install uvicorn
+```
+Install http2 and tls packages
+```
+pipenv install 'Twisted[http2,tls]'
 ```
 
 Migrate the model to the database
