@@ -53,12 +53,13 @@ I have enabled 'autosave features'. So, 'save' won't be mentioned in the follwin
 
 ## Initial setup
 In terminal:
-
+```
 mkdir Remedy_v2_backend
 cd Remedy_v2_backend
-pipenv install django
 pipenv shell
+pipenv install django
 django-admin startproject backend .
+```
 
 Initialize a new git repository
 ```
