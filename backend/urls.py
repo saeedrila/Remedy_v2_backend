@@ -18,6 +18,7 @@ from appointments.views import (
     FetchExecutiveDashboardData,
     FetchDoctorDashboardData,
     FetchLabDashboardData,
+    CancelAnAppointment,
 )
 from authentication.views import (
     AccountSignup,
@@ -47,7 +48,9 @@ from doctors_and_labs.views import (
     GetListOfTests,
     LabSpecificTest,
 )
-from executives.views import AccountApproval
+from executives.views import (
+    AccountApproval,
+)
 from patients.views import (
     GetPatientProfileDetails,
     PatchProfileDetails,
@@ -80,7 +83,7 @@ schema_view = get_schema_view(
    ), 
    public=True, 
    permission_classes=(permissions.AllowAny,), 
-) 
+)
 
 
 urlpatterns = [
@@ -126,6 +129,9 @@ urlpatterns = [
     path('api/fetch-executive-dashboard-data', FetchExecutiveDashboardData.as_view(), name='fetch-executive-dashboard-data'),
     path('api/fetch-doctor-dashboard-data', FetchDoctorDashboardData.as_view(), name='fetch-doctor-dashboard-data'),
     path('api/fetch-lab-dashboard-data', FetchLabDashboardData.as_view(), name='fetch-lab-dashboard-data'),
+
+    # Cancel an appointment by patient
+    path('api/delete-cancel-an-appointment', CancelAnAppointment.as_view(), name='patch-cancel-an-appointment'),
     
 
 #Chat

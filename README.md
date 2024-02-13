@@ -46,6 +46,9 @@ Working code (Not all features are tested)
 * Minor changes in the asgi.py file, now the server is running with 'daphne backend.asgi:application' command.
 * Installed new package for http2 and tls support.
 
+1.0.5b
+* Patients now can cancel appointments. The amount will be refunded to the source.
+
 
 ## Prerequisites:
 I am using VSCode for my development and its integrated terminal. Any IDE and command prompt is enough.

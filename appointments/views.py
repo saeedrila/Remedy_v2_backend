@@ -7,6 +7,7 @@ from rest_framework import status
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime, timedelta
 from django.db.models import Sum
+from django.shortcuts import get_object_or_404
 
 from .serializers import (
     PatientAppointmentsSerializer,
@@ -258,3 +259,23 @@ class FetchLabDashboardData(APIView):
         }
         # print('Data: ', data)
         return Response(data, status=status.HTTP_200_OK)
+
+# Cancel an appointment by patient
+class CancelAnAppointment(APIView):
+    def delete(self, request):
+        appointment_id = self.request.query_params.get('appointment_id', None)
+        if not appointment_id:
+            return Response({'error': 'Appointment ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        appointment = get_object_or_404(Appointments, appointment_id=appointment_id)
+
+        appointment.status = 'Cancelled'
+        appointment.save()
+        try:
+            appointment.payment.payment_status = 'cancelled'
+            appointment.payment.save()
+        except:
+            return Response({'error': 'Payment error'}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'message': 'Appointment has been cancelled'}, status=status.HTTP_200_OK)
+    

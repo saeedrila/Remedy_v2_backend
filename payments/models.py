@@ -13,6 +13,15 @@ class Payments(models.Model):
     razorpay_payment_id = models.CharField(max_length=100, null=True)
     razorpay_payment_signature = models.CharField(max_length=100, null=True)
     appointment_completion = models.BooleanField(default=False)
+    payment_status = models.CharField(
+        max_length=20, 
+        choices=[
+            ('pending', 'Pending'),
+            ('completed', 'Completed'),
+            ('cancelled', 'Cancelled'),
+        ],
+        default = 'completed'
+    )
     
     def __str__(self):
         return str(self.id)
