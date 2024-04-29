@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-django = "*"
+django = "4.2.7"
 python-decouple = "*"
 psycopg = "*"
 djangorestframework = "*"
@@ -20,7 +20,7 @@ channels = "*"
 daphne = "*"
 pytz = "*"
 uvicorn = "*"
-twisted = {version = "*", extras = ["http2", "tls"]}
+twisted = {version = "23.10.0", extras = ["http2", "tls"]}
 
 [dev-packages]
 

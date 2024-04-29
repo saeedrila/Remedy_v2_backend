@@ -49,6 +49,9 @@ Working code (Not all features are tested)
 1.0.5b
 * Patients now can cancel appointments. The amount will be refunded to the source.
 
+1.0.6b
+* Executives cannot block themselves from the platform. No executives can block superuser from platform
+
 
 ## Prerequisites:
 I am using VSCode for my development and its integrated terminal. Any IDE and command prompt is enough.

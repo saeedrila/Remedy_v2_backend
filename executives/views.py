@@ -71,8 +71,7 @@ class AccountApproval(APIView):
             try:
                 decoded_token = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
                 user_id = decoded_token.get('user_id')
-                print('User ID:', user_id)
-
+                
             except jwt.ExpiredSignatureError:
                 print('Token has expired')
 
@@ -92,9 +91,13 @@ class AccountApproval(APIView):
         
         id = serializer.validated_data['id']
         activation_status = serializer.validated_data['status']
+        if id == user_id:
+            return Response({"detail": "You cannot block yourself from the platform"}, status=status.HTTP_403_FORBIDDEN)
 
         try:
             account = Account.objects.get(id = id)
+            if account.is_admin:
+                return Response({"detail": "This is a superuser account. You are not authorized to do this operation"}, status=status.HTTP_403_FORBIDDEN)
             account.is_active = activation_status
             account.save()
 
